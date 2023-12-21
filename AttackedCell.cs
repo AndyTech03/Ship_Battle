@@ -20,7 +20,7 @@ namespace Ship_Battle
 			Miss = is_miss;
 		}
 
-		public override String ToString()
+		public override string ToString()
 		{
 			if (Miss)
 			{
