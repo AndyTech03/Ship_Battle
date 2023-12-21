@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ship_Battle
 {
@@ -44,7 +42,6 @@ namespace Ship_Battle
 			_player_ships.Clear();
 			// Заполняем его новыми корабляеми
 			Randomize_Ships(ref _player_ships);
-
 			Draw_Map();
 			Draw_Ships();
 		}

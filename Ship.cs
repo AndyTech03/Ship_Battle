@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace Ship_Battle
 {
     class Ship
-    {
-		// Положение порабля
+	{
+		/// <summary>
+		/// Положение порабля
+		/// </summary>
 		public Point Location;
-		// Положение палуб
+		/// <summary>
+		/// Положение палуб
+		/// </summary>
 		public Point[] Decks;
-		// Целостность палуб
+		/// <summary>
+		/// Целостность палуб
+		/// </summary>
 		public bool[] Decks_Health; 
 
 		public Ship(int x, int y, Point[] decks)
@@ -24,7 +26,7 @@ namespace Ship_Battle
 
 		public override string ToString()
 		{
-			return "Ship" + Location.ToString();
+			return "Ship [" + string.Join(",", Decks.Select(ship => "(" + ship.ToString() + ")")) + "]";
 		}
 	}
 }

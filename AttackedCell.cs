@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ship_Battle
 {
     class AttackedCell
     {
-		// Место выстрела
+		/// <summary>
+		/// Место выстрела
+		/// </summary>
 		public Point Location;
-		// Выстрел промазал?
+
+		/// <summary>
+		/// Выстрел промазал?
+		/// </summary>
 		public bool Miss;
 
 		public AttackedCell(int x, int y, bool is_miss)
@@ -23,9 +24,9 @@ namespace Ship_Battle
 		{
 			if (Miss)
 			{
-				return "Miss" + Location.ToString();
+				return "Miss (" + Location.ToString() + ")";
 			}
-			return "Hit" + Location.ToString();
+			return "Hit (" + Location.ToString() + ")";
 		}
 	}
 }

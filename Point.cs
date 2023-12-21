@@ -8,16 +8,34 @@ namespace Ship_Battle
 {
     class Point
     {
-		// X координата
+        /// <summary>
+        /// X координата
+        /// </summary>
 		public int X;
-		// Y координата
+        /// <summary>
+        /// Y координата
+        /// </summary>
 		public int Y;
 
+        /// <summary>
+        /// Создаёт новую точку с координатами X = <paramref name="x"/>, Y = <paramref name="y"/>
+        /// </summary>
+        /// <param name="x">X координата</param>
+        /// <param name="y">Y координата</param>
 		public Point(int x, int y)
 		{
 			X = x;
 			Y = y;
-		}
+        }
+
+        /// <summary>
+        /// Преобразует объект <see cref="Point"/> в строку
+        /// </summary>
+        /// <returns>Строка вида: "X,Y"</returns>
+        public override string ToString()
+        {
+            return X + "," + Y;
+        }
 
         public override bool Equals(object obj)
         {
@@ -30,11 +48,6 @@ namespace Ship_Battle
         {
             return HashCode.Combine(X, Y);
         }
-
-        public override string ToString()
-		{
-			return "{" + X + "," + Y + "}";
-		}
 
         public static bool operator ==(Point left, Point right)
         {
