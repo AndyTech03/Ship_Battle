@@ -14,9 +14,9 @@ namespace Ship_Battle
 		/// </summary>
 		public bool Miss;
 
-		public AttackedCell(int x, int y, bool is_miss)
+		public AttackedCell(Point cell, bool is_miss)
 		{
-			Location = new Point(x, y);
+			Location = cell;
 			Miss = is_miss;
 		}
 

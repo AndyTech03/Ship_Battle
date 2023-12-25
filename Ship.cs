@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace Ship_Battle
 {
@@ -9,19 +11,18 @@ namespace Ship_Battle
 		/// </summary>
 		public Point Location;
 		/// <summary>
-		/// Положение палуб
+		/// Палубы корабля
 		/// </summary>
-		public Point[] Decks;
-		/// <summary>
-		/// Целостность палуб
-		/// </summary>
-		public bool[] Decks_Health; 
+		public Dictionary<Point, bool> Decks;
 
 		public Ship(int x, int y, Point[] decks)
 		{
 			Location = new Point(x, y);
-			Decks = decks;
-			Decks_Health = Enumerable.Repeat(true, decks.Length).ToArray();
+			Decks = new Dictionary<Point, bool>();
+			foreach(Point cell in decks)
+            {
+				Decks.Add(cell, true);
+			}
 		}
 
 		public override string ToString()
