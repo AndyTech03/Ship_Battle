@@ -91,7 +91,7 @@ namespace Ship_Battle
 			while (true)
 			{
 				// Запоминаем на какой строке закончился ввод
-				int last_line = Console.CursorTop;
+				int last_line = Console.CursorTop + 1;
 				// Поднимаемся нас строку под игровым полем
 				Console.SetCursorPosition(0, FIELD_ROWS);
 				// Очищаем строки
@@ -107,57 +107,90 @@ namespace Ship_Battle
 				(FireResult result, Ship hited_ship) = Fire(cell, ref _player_attacks, ref _computer_ships);
 				switch (result)
 				{
-// Задание 1:
 					case FireResult.Wrong:
 						{
-							// Замените это на правильный код
-							throw new NotImplementedException(
-								"Вы не прописали реакцию на неверный ввод координат!\n" +
-								"Если вы это видите значит клетка которую вы выбрали не может быть аттакована!"
-							);
+							Console.WriteLine("Сюда нельзя выстрелить!");
+							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
+							Console.ReadKey();
 						}
 						// Если выстрел неверный вводим по новой
 						break;
-// Задание 2:
 					case FireResult.Miss:
 						{
-							// Замените это на правильный код
-							throw new NotImplementedException(
-								"Вы не прописали реализацию промоха!\n" +
-								"Если вы это видите значит вы не попали по кораблю противника!"
-							);
+							Paint_Computer_Cell(cell, false);
+							Console.WriteLine("Мимо, но так как противник не умеет стрелять...");
+							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
+							Console.ReadKey();
 						}
 						// Ход окончен, очередь переходит к Компьютеру
 						return false;
-// Задание 3:
 					case FireResult.Hit:
 						{
-							// Замените это на правильный код
-							throw new NotImplementedException(
-								"Вы не прописали реализацию попадания!\n" +
-								"Если вы это видите значит вы попали по кораблю противника!"
-							);
+							Paint_Computer_Cell(cell, true);
 						}
 						break;
-// Задание 4:
 					case FireResult.Destroy:
 						{
-							// Замените это на правильный код
-							throw new NotImplementedException(
-								"Вы не прописали реализацию добивания корабля!\n" +
-								"Если вы это видите значит вы добили корабль противника!"
-							);
+							Paint_Computer_Cell(cell, true);
+							int min_x = hited_ship.Decks.Keys.Min(location => location.X) - 1;
+							int min_y = hited_ship.Decks.Keys.Min(location => location.Y) - 1;
+							int max_x = hited_ship.Decks.Keys.Max(location => location.X) + 1;
+							int max_y = hited_ship.Decks.Keys.Max(location => location.Y) + 1;
+
+							for (int y = min_y; y <= max_y; y++)
+							{
+								if (y == -1 || y == 10)
+								{
+									continue;
+								}
+								for (int x = min_x; x <= max_x; x++)
+								{
+									if (x == -1 || x == 10)
+									{
+										continue;
+									}
+									Point p = new Point(x, y);
+									if (_player_attacks.All(attack => attack.Location != p))
+									{
+										_player_attacks.Add(new AttackedCell(p, true));
+										Paint_Computer_Cell(p, false);
+									}
+								}
+							}
 						}
 						// Продолжаем ход
 						break;
-// Задание 5:
 					case FireResult.Win:
 						{
-							// Замените это на правильный код
-							throw new NotImplementedException(
-								"Вы не прописали реакцию на победный исход боя!\n" +
-								"Если вы это видите значит вы уничтожили последний корабль флота врага!"
-							);
+							Paint_Computer_Cell(cell, true);
+							int min_x = hited_ship.Decks.Keys.Min(location => location.X) - 1;
+							int min_y = hited_ship.Decks.Keys.Min(location => location.Y) - 1;
+							int max_x = hited_ship.Decks.Keys.Max(location => location.X) + 1;
+							int max_y = hited_ship.Decks.Keys.Max(location => location.Y) + 1;
+
+							for (int y = min_y; y <= max_y; y++)
+							{
+								if (y == -1 || y == 10)
+								{
+									continue;
+								}
+								for (int x = min_x; x <= max_x; x++)
+								{
+									if (x == -1 || x == 10)
+									{
+										continue;
+									}
+									Point p = new Point(x, y);
+									if (_player_attacks.All(attack => attack.Location != p))
+									{
+										_player_attacks.Add(new AttackedCell(p, true));
+										Paint_Computer_Cell(p, false);
+									}
+								}
+							}
+							Console.WriteLine("Вы победили! Наверное это круто.");
+							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
+							Console.ReadKey();
 						}
 						// Игра окончена
 						return true;
@@ -221,12 +254,12 @@ namespace Ship_Battle
 			if (hit)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.Write(""); // Впишите сюда символ попадания
+				Console.Write("██"); // Впишите сюда символ попадания
 				Console.ResetColor();
 			}
             else
 			{
-				Console.Write(""); // Впишите сюда символ промаха
+				Console.Write("<>"); // Впишите сюда символ промаха
 			}
 
 			// Возвращаем курсор в изначальное положение
@@ -342,17 +375,6 @@ namespace Ship_Battle
 		/// </summary>
 		private void Draw_Ships()
 		{
-			Console.ForegroundColor = ConsoleColor.DarkRed; // Установим цвет
-			// Переберём все корабли Компьютера
-			foreach (Ship ship in _computer_ships)
-			{
-				foreach (Point deck in ship.Decks.Keys)
-				{
-					Console.SetCursorPosition((deck.X + 2) * 2, deck.Y + 2);
-					Console.Write("██"); // Alt + 219
-				}
-			}
-
 			Console.ForegroundColor = ConsoleColor.DarkCyan; // Установим цвет
 			// Переберём все корабли Пользователя
 			foreach (Ship ship in _player_ships)
