@@ -70,12 +70,122 @@ namespace Ship_Battle
 			Restart_Game();
 			// Начинаем главный цикл игры
             while (true)
-            {
+			{
+				// Ход Компьютера
+				bool computer_win = Computer_Turn();
+				Clear();
+				if (computer_win)
+				{
+					Restart_Game();
+				}
+				/*
+				// Ход Пользователя
 				bool player_win = Player_Turn();
+				Clear();
 				if (player_win)
                 {
 					Restart_Game();
-                }
+				}
+				*/
+				Console.ReadKey();
+			}
+		}
+
+		private bool Computer_Turn()
+        {
+			while (true)
+			{
+				Point cell = new Point(_random.Next(MAP_SIZE), _random.Next(MAP_SIZE));
+				// Производим выстрел
+				(FireResult result, Ship hited_ship) = Fire(cell, ref _computer_attacks, ref _player_ships);
+				switch (result)
+				{
+					case FireResult.Wrong:
+						{
+							Console.WriteLine("ИИ СЛОМАЛСЯ!");
+							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
+							Console.ReadKey();
+							Environment.Exit(0);
+						}
+						// Если выстрел неверный вводим по новой
+						break;
+					case FireResult.Miss:
+						{
+							Paint_Player_Cell(cell, false);
+						}
+						// Ход окончен, очередь переходит к Компьютеру
+						return false;
+					case FireResult.Hit:
+						{
+							Paint_Player_Cell(cell, true);
+						}
+						break;
+					case FireResult.Destroy:
+						{
+							Paint_Player_Cell(cell, true);
+							int min_x = hited_ship.Decks.Keys.Min(location => location.X) - 1;
+							int min_y = hited_ship.Decks.Keys.Min(location => location.Y) - 1;
+							int max_x = hited_ship.Decks.Keys.Max(location => location.X) + 1;
+							int max_y = hited_ship.Decks.Keys.Max(location => location.Y) + 1;
+
+							for (int y = min_y; y <= max_y; y++)
+							{
+								if (y == -1 || y == 10)
+								{
+									continue;
+								}
+								for (int x = min_x; x <= max_x; x++)
+								{
+									if (x == -1 || x == 10)
+									{
+										continue;
+									}
+									Point point = new Point(x, y);
+									if (_computer_attacks.All(attack => attack.Location != point))
+									{
+										_computer_attacks.Add(new AttackedCell(point, true));
+										Paint_Player_Cell(point, false);
+									}
+								}
+							}
+						}
+						// Продолжаем ход
+						break;
+					case FireResult.Win:
+						{
+							Paint_Player_Cell(cell, true);
+							int min_x = hited_ship.Decks.Keys.Min(location => location.X) - 1;
+							int min_y = hited_ship.Decks.Keys.Min(location => location.Y) - 1;
+							int max_x = hited_ship.Decks.Keys.Max(location => location.X) + 1;
+							int max_y = hited_ship.Decks.Keys.Max(location => location.Y) + 1;
+
+							for (int y = min_y; y <= max_y; y++)
+							{
+								if (y == -1 || y == 10)
+								{
+									continue;
+								}
+								for (int x = min_x; x <= max_x; x++)
+								{
+									if (x == -1 || x == 10)
+									{
+										continue;
+									}
+									Point p = new Point(x, y);
+									if (_computer_attacks.All(attack => attack.Location != p))
+									{
+										_computer_attacks.Add(new AttackedCell(p, true));
+										Paint_Player_Cell(p, false);
+									}
+								}
+							}
+							Console.WriteLine("Компьютер победили! Наверное это обидно.");
+							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
+							Console.ReadKey();
+						}
+						// Игра окончена
+						return true;
+				}
 			}
 		}
 
@@ -86,21 +196,8 @@ namespace Ship_Battle
 		/// <returns>Возвращает true - если он победил, false - если он промазал</returns>
 		private bool Player_Turn()
 		{
-			// Ластик, в нашем случае пустая строка длинной во всю консоль...
-			string eraser = new string(' ', Console.BufferWidth);
 			while (true)
 			{
-				// Запоминаем на какой строке закончился ввод
-				int last_line = Console.CursorTop + 1;
-				// Поднимаемся нас строку под игровым полем
-				Console.SetCursorPosition(0, FIELD_ROWS);
-				// Очищаем строки
-				for (int i = 0; i < last_line - FIELD_ROWS; i++)
-				{
-					Console.WriteLine(eraser);
-				}
-				// Вновь поднимаемся
-				Console.SetCursorPosition(0, FIELD_ROWS);
 				// Пользователь вводит координаты выстрела
 				Point cell = new Point(Player_Input("X = "), Player_Input("Y = "));
 				// Производим выстрел
@@ -118,7 +215,7 @@ namespace Ship_Battle
 					case FireResult.Miss:
 						{
 							Paint_Computer_Cell(cell, false);
-							Console.WriteLine("Мимо, но так как противник не умеет стрелять...");
+							Console.WriteLine("Мимо, теперь очередь компьютера.");
 							Console.WriteLine("Нажмите любую клавишу чтобы продолжить...");
 							Console.ReadKey();
 						}
@@ -195,7 +292,26 @@ namespace Ship_Battle
 						// Игра окончена
 						return true;
 				}
+				// Очищаем поле ввода/вывода
+				Clear();
 			}
+		}
+
+		private void Clear()
+		{
+			// Ластик, в нашем случае пустая строка длинной во всю консоль...
+			string eraser = new string(' ', Console.BufferWidth);
+			// Запоминаем на какой строке закончился ввод
+			int last_line = Console.CursorTop + 1;
+			// Поднимаемся нас строку под игровым полем
+			Console.SetCursorPosition(0, FIELD_ROWS);
+			// Очищаем строки
+			for (int i = 0; i < last_line - FIELD_ROWS; i++)
+			{
+				Console.WriteLine(eraser);
+			}
+			// Вновь поднимаемся
+			Console.SetCursorPosition(0, FIELD_ROWS);
 		}
 
 		/// <summary>
@@ -244,6 +360,27 @@ namespace Ship_Battle
 			return (FireResult.Miss, null);
 		}
 
+		private void Paint_Player_Cell(Point cell, bool hit)
+		{
+			// Запоминаем где был курсор до операции
+			(int x, int y) = Console.GetCursorPosition();
+
+			// Делаем операцию по закрашиванию
+			Console.SetCursorPosition((cell.X + 2) * 2, cell.Y + 2 + MAP_SIZE + 2 + 1);
+			if (hit)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkCyan;
+				Console.Write("░░"); // Впишите сюда символ попадания
+				Console.ResetColor();
+			}
+			else
+			{
+				Console.Write("<>"); // Впишите сюда символ промаха
+			}
+
+			// Возвращаем курсор в изначальное положение
+			Console.SetCursorPosition(x, y);
+		}
 		private void Paint_Computer_Cell(Point cell, bool hit)
         {
 			// Запоминаем где был курсор до операции
@@ -311,6 +448,8 @@ namespace Ship_Battle
 			Draw_Map();
 			// Отрисовываем корабли
 			Draw_Ships();
+			// Переносим курсор в конец поля
+			Console.SetCursorPosition(0, FIELD_ROWS);
 		}
 
 		/// <summary>
